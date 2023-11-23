@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoThreads</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .btn-container {
+            margin-top: 20px;
+        }
+        #userDashboard {
+            display: none;
+        }
+        #shoppingCart {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+        }
+        .dashboard-sections {
+            display: flex;
+            justify-content: space-between;
+        }
+        .search-section,
+        .upload-section {
+            width: 48%;
+        }
+        .item {
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+        .item img {
+            max-width: 100%;
+            max-height: 100px;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Welcome to EcoThreads</h1>
+
+        <!-- Login Modal -->
+        <div class="modal" id="loginModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">Login</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <!-- Modal Body -->
+                    <div class="modal-body">
+                        <form onsubmit="handleLogin(); return false;">
+                            <div class="form-group">
+                                <label for="loginEmail">Email:</label>
+                                <input type="email" class="form-control" id="loginEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="loginPassword">Password:</label>
+                                <input type="password" class="form-control" id="loginPassword" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Login</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signup Modal -->
+        <div class="modal" id="signupModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">Sign Up</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <!-- Modal Body -->
+                    <div class="modal-body">
+                        <form onsubmit="handleSignUp(); return false;">
+                            <div class="form-group">
+                                <label for="signupEmail">Email:</label>
+                                <input type="email" class="form-control" id="signupEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="signupPassword">Password:</label>
+                                <input type="password" class="form-control" id="signupPassword" required>
+                            </div>
+                            <button type="submit" class="btn btn-success">Sign Up</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Dashboard -->
+        <div id="userDashboard">
+            <div id="shoppingCart">
+                <h3>Shopping Cart</h3>
+                <ul id="cartItems"></ul>
+                <button class="btn btn-success" onclick="generateToken()">Submit Reservation</button>
+                <button class="btn btn-danger" onclick="signOff()">Sign Off</button>
+            </div>
+
+            <div class="dashboard-sections">
+                <!-- Search Section -->
+                <div class="search-section">
+                    <h2>Search for Items</h2>
+                    <!-- Add search filters similar to upload section -->
+                    <div class="mb-3">
+                        <label for="searchItem">Search Item:</label>
+                        <input type="text" class="form-control" id="searchItem">
+                    </div>
+                    <div class="mb-3">
+                        <label for="searchType">Type:</label>
+                        <select class="form-control" id="searchType">
+                            <option value="men">Men</option>
+                            <option value="women">Women</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary mt-2" onclick="searchItems()">Search</button>
+                    <!-- Display search results -->
+                    <div id="searchResults"></div>
+                </div>
+
+                <!-- Upload Section -->
+                <div class="upload-section">
+                    <h2>Upload Clothes</h2>
+                    <form onsubmit="handleUpload(); return false;">
+                        <div class="form-group">
+                            <label for="clothingType">Clothing Type:</label>
+                            <input type="text" class="form-control" id="clothingType" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="size">Size:</label>
+                            <input type="text" class="form-control" id="size" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="color">Color:</label>
+                            <input type="text" class="form-control" id="color" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="gender">Gender:</label>
+                            <select class="form-control" id="gender" required>
+                                <option value="men">Men</option>
+                                <option value="women">Women</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="image">Upload Image:</label>
+                            <input type="file" class="form-control-file" id="image" accept="image/*" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buttons for Login and Signup -->
+        <div class="btn-container">
+            <button class="btn btn-primary" data-toggle="modal" data-target="#loginModal" id="loginBtn">Login</button>
+            <button class="btn btn-success" data-toggle="modal" data-target="#signupModal" id="signupBtn">Sign Up</button>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        // Simulated storage for uploaded items
+        const uploadedItems = [];
+
+        function handleLogin() {
+            alert('Login successful!');
+            showUserDashboard();
+            // Additional logic for redirection or other actions
+        }
+
+        function handleSignUp() {
+            alert('Sign up successful!');
+            showUserDashboard();
+            // Additional logic for redirection or other actions
+        }
+
+        function showUserDashboard() {
+            $('#loginModal').modal('hide');
+            $('#signupModal').modal('hide');
+            document.getElementById('userDashboard').style.display = 'block';
+            document.getElementById('loginBtn').style.display = 'none';
+            document.getElementById('signupBtn').style.display = 'none';
+        }
+
+        function searchItems() {
+            const searchResultsDiv = document.getElementById('searchResults');
+            const searchTerm = document.getElementById('searchItem').value.toLowerCase();
+            const searchType = document.getElementById('searchType').value.toLowerCase();
+
+            // Filter items based on search term and type
+            const filteredItems = uploadedItems.filter(item => {
+                return (
+                    item.clothingType.toLowerCase().includes(searchTerm) &&
+                    item.gender.toLowerCase() === searchType
+                );
+            });
+
+            // Display search results
+            searchResultsDiv.innerHTML = '';
+            filteredItems.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.classList.add('item');
+                const img = new Image();
+                img.src = item.image;
+                img.alt = item.clothingType;
+                itemDiv.appendChild(img);
+                itemDiv.innerHTML += `
+                    <p>Clothing Type: ${item.clothingType}</p>
+                    <p>Size: ${item.size}</p>
+                    <p>Color: ${item.color}</p>
+                    <p>Gender: ${item.gender}</p>
+                    <button class="btn btn-primary" onclick="reserveItem('${item.clothingType}')">Reserve</button>
+                `;
+                searchResultsDiv.appendChild(itemDiv);
+            });
+        }
+
+        function handleUpload() {
+            const clothingType = document.getElementById('clothingType').value;
+            const size = document.getElementById('size').value;
+            const color = document.getElementById('color').value;
+            const gender = document.getElementById('gender').value;
+            const imageInput = document.getElementById('image');
+            
+            // Use FileReader to read the contents of the uploaded image
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const image = e.target.result;
+                
+                // Simulate storing the uploaded item
+                uploadedItems.push({ clothingType, size, color, gender, image });
+                
+                alert('Clothing uploaded successfully!');
+                // Additional logic for handling clothing upload
+            };
+            
+            // Read the contents of the image file
+            reader.readAsDataURL(imageInput.files[0]);
+        }
+
+        function reserveItem(itemName) {
+            const cartItemsUl = document.getElementById('cartItems');
+            const listItem = document.createElement('li');
+            listItem.textContent = itemName;
+            cartItemsUl.appendChild(listItem);
+        }
+
+        function generateToken() {
+            alert('Token generated! Please note it for reference.');
+        }
+
+        function signOff() {
+            document.getElementById('userDashboard').style.display = 'none';
+            document.getElementById('loginBtn').style.display = 'block';
+            document.getElementById('signupBtn').style.display = 'block';
+        }
+    </script>
+
+</body>
+</html>
